@@ -1236,6 +1236,7 @@ function gamipress_get_achievement_limit_timestamp( $achievement_id = 0 ) {
  * Award an achievement to the user
  *
  * @since  1.0.0
+ * @udated tambaqui fork Added gamipress_award_achievement_object and gamipress_award_achievement_log_meta_data hooks
  *
  * @param  int 	    $achievement_id The given achievement ID to award
  * @param  int 	    $user_id        The given user's ID
@@ -1268,11 +1269,34 @@ function gamipress_award_achievement_to_user( $achievement_id = 0, $user_id = 0,
 	// Setup our achievement
 	$achievement = gamipress_build_achievement_object( $achievement_id );
 
+    /**
+     * Available filter to customize achievement object  with latest event triggered args
+     * 
+     * @param  false|object 	$achievement    The given achievement object
+     * @param  int 	            $user_id        The given user's ID
+     * @param  string 	        $trigger    	The trigger
+     * @param  int 	            $site_id        The triggered site id
+     * @param  array 	        $args           The triggered args
+     */
+    $achievement = apply_filters( 'gamipress_award_achievement_object', $achievement, $user_id, $trigger, $site_id, $args );
+
 	// Update user's earned achievements
 	gamipress_update_user_achievements( array( 'user_id' => $user_id, 'new_achievements' => array( $achievement ) ) );
 
 	// Log the earning of the award
-	gamipress_log_user_achievement_award( $user_id, $achievement_id, $admin_id, $trigger );
+    $log_meta = array();
+    /**
+     * Available filter to insert custom achievement award log meta data
+     * 
+     * @param  array 	$log_meta
+     * @param  int 	    $user_id        The given user's ID
+     * @param  int 	    $achievement_id The given achievement ID to award
+     * @param  string 	$trigger    	The trigger
+     * @param  int 	    $site_id        The triggered site id
+     * @param  array 	$args           The triggered args
+     */
+    $log_meta = apply_filters( 'gamipress_award_achievement_log_meta_data', $log_meta, $user_id, $achievement_id, $trigger, $site_id, $args );
+    gamipress_log_user_achievement_award( $user_id, $achievement_id, $admin_id, $trigger, $log_meta );
 
 	// Available hook for unlocking any achievement of this achievement type
 	do_action( 'gamipress_unlock_' . $achievement->post_type, $user_id, $achievement_id, $trigger, $site_id, $args );

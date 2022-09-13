@@ -1339,19 +1339,19 @@ add_filter( 'post_updated_messages', 'gamipress_achievement_type_update_messages
  *
  * @since   1.0.0
  * @updated 1.4.7 Added $trigger parameter
+ * @udated tambaqui fork Added $log_meta parameter
  *
  * @param int       $user_id        The user ID
  * @param int       $achievement_id The associated achievement ID
  * @param int       $admin_id       An admin ID (if admin-awarded)
  * @param string    $trigger        The trigger that fires this function
+ * @param array    $log_meta       Log meta
  */
-function gamipress_log_user_achievement_award( $user_id, $achievement_id, $admin_id = 0, $trigger = '' ) {
+function gamipress_log_user_achievement_award( $user_id, $achievement_id, $admin_id = 0, $trigger = '', $log_meta = array() ) {
 
     $post_type = gamipress_get_post_type( $achievement_id );
 
-	$log_meta = array(
-		'achievement_id' => $achievement_id,
-	);
+	$log_meta['achievement_id'] = $achievement_id;
 
 	$access = 'public';
 
